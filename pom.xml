@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>dev.damer</groupId>
-    <artifactId>ElasticsearchClient</artifactId>
+    <artifactId>ElasticsearchClient-docker</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
