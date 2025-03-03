@@ -54,8 +54,14 @@ public class ProductController {
     }
 
     @GetMapping("/search/{category}")
-    public ResponseEntity<List<Product>> getAllProductByCategory(@PathVariable String category) {
+    public ResponseEntity<List<Product>> getAllProductByCategory(@PathVariable String category) throws IOException{
         List<Product> products = productService.getProductByCategory(category);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/searchByPriceRange")
+    public ResponseEntity<List<Product>> searchByPriceRange(@RequestParam double minPrice,@RequestParam double maxPrice) throws IOException {
+        List<Product> products = productService.searchByPriceRange(minPrice,maxPrice);
         return ResponseEntity.ok(products);
     }
 }

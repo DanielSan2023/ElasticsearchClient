@@ -4,6 +4,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.ObjectBuilder;
 import org.springboot.exception.ProductNotFoundException;
 import org.springboot.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -134,6 +137,34 @@ public class ProductServiceImpl implements ProductService {
             return products;
         } catch (IOException e) {
             throw new RuntimeException("Error while fetching products by category: " + category, e);
+        }
+    }
+
+    @Override
+    public List<Product> searchByPriceRange(double minPrice, double maxPrice) {
+        SearchRequest request = new SearchRequest.Builder()
+                .index("products-002")
+                .query(q -> q
+                        .range(r -> r
+                                .field("price")
+                                .gte(JsonData.of(minPrice))
+                                .lte(JsonData.of(maxPrice))))
+                .build();
+
+        try {
+            SearchResponse response = client.search(request, Product.class);
+
+            List<Hit<Product>> hits = response.hits().hits();
+            List<Product> products = new ArrayList<>();
+
+            for (Hit<Product> hit : hits) {
+                Product product = hit.source();
+                products.add(product);
+            }
+            return products;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

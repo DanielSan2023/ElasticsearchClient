@@ -17,7 +17,10 @@ public interface ProductService {
 
     Product updateProduct(String id, Product product) throws ProductNotFoundException;
 
+
     boolean deleteProduct(String id) throws ProductNotFoundException;
 
     List<Product> getProductByCategory(String category);
+
+    List<Product> searchByPriceRange(double minPrice, double maxPrice);
 }
