@@ -167,4 +167,42 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<Product> fuzzySearch(String searchTerm) {
+        SearchRequest request = new SearchRequest.Builder()
+                .index("products-002")
+                .query(q -> q
+                        .bool(b -> b
+                                .should(s -> s
+                                        .fuzzy(f -> f
+                                                .field("category")
+                                                .value(searchTerm)
+                                                .fuzziness("AUTO"))
+                                )
+                                .should(s -> s
+                                        .fuzzy(f -> f
+                                                .field("name")
+                                                .value(searchTerm)
+                                                .fuzziness("AUTO"))
+                                )
+                        )
+                )
+                .build();
+
+        SearchResponse<Product> response = null;
+        try {
+            response = client.search(request, Product.class);
+
+            List<Hit<Product>> hits = response.hits().hits();
+            List<Product> products = new ArrayList<>();
+            for (Hit<Product> hit : hits) {
+                Product product = hit.source();
+                products.add(product);
+            }
+            return products;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
